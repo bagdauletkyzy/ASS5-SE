@@ -1,0 +1,35 @@
+$ python3 -m pytest -q   (characterization tests, BEFORE refactoring, baseline code)
+...F......                                                               [100%]
+=================================== FAILURES ===================================
+_ test_ac2_export_formats[text-2026-11-01  food         Lunch at canteen            2500.00] _
+
+data_file = PosixPath('/tmp/pytest-of-root/pytest-0/test_ac2_export_formats_text_20/data.json')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fd7fa8c5ba0>, fmt = 'text'
+first_line = '2026-11-01  food         Lunch at canteen            2500.00'
+
+    @pytest.mark.parametrize("fmt,first_line", [
+        ("csv", "date,category,description,amount"),
+        ("json", "["),
+        ("text", "2026-11-01  food         Lunch at canteen            2500.00"),
+    ])
+    def test_ac2_export_formats(data_file, capsys, fmt, first_line):
+        main(["--file", str(data_file), "export", "--format", fmt])
+>       assert capsys.readouterr().out.splitlines()[0] == first_line
+E       AssertionError: assert '2026-11-01  ...      2500.00' == '2026-11-01  ...      2500.00'
+E         
+E         Skipping 43 identical leading characters in diff, use -v to show
+E         -           2500.00
+E         +            2500.00
+E         ? +
+
+tests/test_cli.py:35: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_cli.py::test_ac2_export_formats[text-2026-11-01  food         Lunch at canteen            2500.00]
+1 failed, 9 passed in 0.03s
+[exit code: 1]
+
+--- after correcting the wrong expected string in the test (code unchanged) ---
+$ python3 -m pytest -q
+..........                                                               [100%]
+10 passed in 0.02s
+[exit code: 0]

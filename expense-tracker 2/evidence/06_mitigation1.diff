@@ -1,0 +1,59 @@
+diff --git a/expenses/cli.py b/expenses/cli.py
+index 77de039..b5a39da 100644
+--- a/expenses/cli.py
++++ b/expenses/cli.py
+@@ -1,7 +1,7 @@
+ import argparse
+ import sys
+ 
+-from expenses.models import Expense
++from expenses.models import make_expense
+ from expenses.report import by_category, get_formatter, total
+ from expenses.storage import DEFAULT_FILE, load_expenses, save_expenses
+ 
+@@ -27,7 +27,11 @@ def main(argv=None):
+     expenses = load_expenses(args.file)
+ 
+     if args.cmd == "add":
+-        e = Expense(args.date, args.category, args.description, float(args.amount))
++        try:
++            e = make_expense(args.date, args.category, args.description, args.amount)
++        except ValueError as err:
++            print("Error:", err, file=sys.stderr)
++            sys.exit(2)
+         expenses.append(e)
+         save_expenses(expenses, args.file)
+         print("Added:", e.description, e.amount)
+diff --git a/expenses/models.py b/expenses/models.py
+index 0108d3c..f9f9610 100644
+--- a/expenses/models.py
++++ b/expenses/models.py
+@@ -1,4 +1,6 @@
++import math
+ from dataclasses import dataclass
++from datetime import date as _date
+ 
+ 
+ @dataclass
+@@ -9,6 +11,21 @@ class Expense:
+     amount: float      # in KZT
+ 
+ 
++def make_expense(date: str, category: str, description: str, amount: str) -> Expense:
++    """Build an Expense from user input, rejecting invalid values (ValueError)."""
++    try:
++        _date.fromisoformat(date)
++    except ValueError:
++        raise ValueError(f"invalid date {date!r}, expected a real date YYYY-MM-DD") from None
++    try:
++        value = float(amount)
++    except ValueError:
++        raise ValueError(f"amount {amount!r} is not a number") from None
++    if not math.isfinite(value) or value <= 0:
++        raise ValueError(f"amount must be a positive finite number, got {amount!r}")
++    return Expense(date, category, description, value)
++
++
+ def expense_from_dict(data: dict) -> Expense:
+     return Expense(
+         date=data["date"],

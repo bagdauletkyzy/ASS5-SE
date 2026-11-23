@@ -1,0 +1,8 @@
+$ python3 -m pytest -q tests/test_report.py   (RED: before mitigation 2)
+FAILED tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[=HYPERLINK("http://example.invalid","click")]
+FAILED tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[+1+1]
+FAILED tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[-2+3]
+FAILED tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[@SUM(A1:A2)]
+FAILED tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[\t=1+1]
+FAILED tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[\r=1+1]
+6 failed, 5 passed in 0.03s

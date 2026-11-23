@@ -1,0 +1,116 @@
+== FINAL CHECKS @ 5ac01d5 ==
+$ python3 -m pytest -v
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/claude/expense-tracker
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 26 items
+
+tests/test_cli.py::test_ac1_add_then_summary PASSED                      [  3%]
+tests/test_cli.py::test_ac2_export_formats[csv-date,category,description,amount] PASSED [  7%]
+tests/test_cli.py::test_ac2_export_formats[json-[] PASSED                [ 11%]
+tests/test_cli.py::test_ac2_export_formats[text-2026-11-01  food         Lunch at canteen             2500.00] PASSED [ 15%]
+tests/test_cli.py::test_ac2_export_to_file_adds_extension PASSED         [ 19%]
+tests/test_cli.py::test_ac2_unknown_format_exits_1 PASSED                [ 23%]
+tests/test_cli.py::test_ac3_read_only_commands_do_not_modify_data PASSED [ 26%]
+tests/test_report.py::test_total PASSED                                  [ 30%]
+tests/test_report.py::test_by_category PASSED                            [ 34%]
+tests/test_report.py::test_export_csv_has_header PASSED                  [ 38%]
+tests/test_report.py::test_unknown_format_raises_value_error PASSED      [ 42%]
+tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[=HYPERLINK("http://example.invalid","click")] PASSED [ 46%]
+tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[+1+1] PASSED [ 50%]
+tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[-2+3] PASSED [ 53%]
+tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[@SUM(A1:A2)] PASSED [ 57%]
+tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[\t=1+1] PASSED [ 61%]
+tests/test_report.py::test_r2_csv_export_neutralises_formula_cells[\r=1+1] PASSED [ 65%]
+tests/test_report.py::test_r2_csv_export_keeps_normal_text_and_amounts PASSED [ 69%]
+tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01--5000] PASSED [ 73%]
+tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-0] PASSED [ 76%]
+tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-nan] PASSED [ 80%]
+tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-inf] PASSED [ 84%]
+tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-abc] PASSED [ 88%]
+tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-02-30-100] PASSED [ 92%]
+tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[not-a-date-100] PASSED [ 96%]
+tests/test_validation.py::test_ac4_valid_input_still_accepted PASSED     [100%]
+
+============================== 26 passed in 0.06s ==============================
+[exit code: 0]
+
+$ ruff check .
+F401 [*] `expenses.models.Expense` imported but unused
+ --> expenses/storage.py:4:29
+  |
+2 | import os
+3 |
+4 | from expenses.models import Expense, expense_from_dict, expense_to_dict
+  |                             ^^^^^^^
+5 |
+6 | DEFAULT_FILE = "expenses.json"
+  |
+help: Remove unused import: `expenses.models.Expense`
+  |
+3 |
+  - from expenses.models import Expense, expense_from_dict, expense_to_dict
+4 + from expenses.models import expense_from_dict, expense_to_dict
+5 |
+  |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+[exit code: 1]
+
+$ mypy expenses
+Success: no issues found in 5 source files
+[exit code: 0]
+
+$ python3 -m expenses.cli --file sample_data.json summary
+Total: 10900.0
+  food 9900.0
+  transport 1000.0
+[exit code: 0]
+
+$ python3 -m expenses.cli --file sample_data.json export --format xml
+Unknown format xml
+[exit code: 1]
+
+$ python3 -m compileall -q expenses
+[exit code: 0]
+
+== RESIDUAL checks ==
+$ summary on corrupted JSON (R3, not mitigated)
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 23 (char 22)
+
+$ python3 -m expenses.cli --file /tmp/tmp.RurZUWaaTj/legacy.json summary
+Total: -50.0
+  x -50.0
+[exit code: 0]
+
+$ python3 -c from expenses.models import make_expense as m; print(m('2026-11-01','x','a','0.1').amount + m('2026-11-01','x','b','0.2').amount)
+0.30000000000000004
+[exit code: 0]
+
+$ cat requirements.txt
+pytest
+ruff
+mypy
+[exit code: 0]
+
+== git ==
+5ac01d5 (HEAD -> main, tag: final) fix(R2): neutralise CSV formula injection in export
+f6d43dc fix(R1): validate amount (positive, finite, numeric) and date on add; exit 2 with clear error
+48dfe68 (tag: after-pattern) refactor: Strategy registry for export formats (removes duplicated if/elif in report.py and cli.py)
+4bcbbc0 test: fix expected text-export line (test bug, 1 space)
+688b504 test: characterization tests for CLI acceptance criteria AC1-AC3
+61e86cb docs: add AGENTS.md, CLAUDE.md pointer; fix outdated README (entry point, storage)
+e11ee4f (tag: baseline) Baseline: expense tracker v0.1.0
+ AGENTS.md                | 70 +++++++++++++++++++++++++++++++++++++++
+ CLAUDE.md                |  5 +++
+ README.md                | 26 ++++++++++-----
+ expenses/cli.py          | 24 +++++++-------
+ expenses/models.py       | 17 ++++++++++
+ expenses/report.py       | 85 ++++++++++++++++++++++++++++++++++++------------
+ tests/test_cli.py        | 56 +++++++++++++++++++++++++++++++
+ tests/test_report.py     | 26 +++++++++++++++
+ tests/test_validation.py | 31 ++++++++++++++++++
+ 9 files changed, 300 insertions(+), 40 deletions(-)

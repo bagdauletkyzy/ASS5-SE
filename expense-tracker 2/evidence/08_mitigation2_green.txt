@@ -1,0 +1,19 @@
+(GREEN: after mitigation 2)
+$ python3 -m pytest -q
+..........................                                               [100%]
+26 passed in 0.04s
+[exit code: 0]
+
+$ mypy expenses
+Success: no issues found in 5 source files
+[exit code: 0]
+
+$ python3 -m expenses.cli --file /tmp/tmp.bxYUrnwkPt/c.json export --format csv
+date,category,description,amount
+2026-11-01,food,Lunch at canteen,2500.0
+2026-11-02,transport,Bus card top-up,1000.0
+2026-11-03,food,Groceries,7400.0
+2026-11-04,misc,"'=HYPERLINK(""http://example.invalid"",""click"")",100.0
+
+[exit code: 0]
+

@@ -1,0 +1,62 @@
+$ python3 -m pytest -q
+...                                                                      [100%]
+3 passed in 0.01s
+[exit code: 0]
+
+$ ruff check .
+F401 [*] `expenses.models.Expense` imported but unused
+ --> expenses/storage.py:4:29
+  |
+2 | import os
+3 |
+4 | from expenses.models import Expense, expense_from_dict, expense_to_dict
+  |                             ^^^^^^^
+5 |
+6 | DEFAULT_FILE = "expenses.json"
+  |
+help: Remove unused import: `expenses.models.Expense`
+  |
+3 |
+  - from expenses.models import Expense, expense_from_dict, expense_to_dict
+4 + from expenses.models import expense_from_dict, expense_to_dict
+5 |
+  |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+[exit code: 1]
+
+$ mypy expenses
+expenses/report.py:11: error: Incompatible types in assignment (expression has type "float", variable has type "int")  [assignment]
+expenses/report.py:16: error: Need type annotation for "result" (hint: "result: dict[<type>, <type>] = ...")  [var-annotated]
+Found 2 errors in 1 file (checked 5 source files)
+[exit code: 1]
+
+$ mypy --strict expenses
+expenses/models.py:12: error: Missing type arguments for generic type "dict"  [type-arg]
+expenses/models.py:21: error: Missing type arguments for generic type "dict"  [type-arg]
+expenses/storage.py:9: error: Function is missing a type annotation  [no-untyped-def]
+expenses/storage.py:17: error: Function is missing a type annotation  [no-untyped-def]
+expenses/report.py:11: error: Incompatible types in assignment (expression has type "float", variable has type "int")  [assignment]
+expenses/report.py:15: error: Missing type arguments for generic type "dict"  [type-arg]
+expenses/report.py:16: error: Need type annotation for "result" (hint: "result: dict[<type>, <type>] = ...")  [var-annotated]
+expenses/cli.py:9: error: Function is missing a type annotation  [no-untyped-def]
+expenses/cli.py:27: error: Call to untyped function "load_expenses" in typed context  [no-untyped-call]
+expenses/cli.py:32: error: Call to untyped function "save_expenses" in typed context  [no-untyped-call]
+expenses/cli.py:62: error: Call to untyped function "main" in typed context  [no-untyped-call]
+Found 11 errors in 4 files (checked 5 source files)
+[exit code: 1]
+
+$ python3 main.py summary
+python3: can't open file '/home/claude/expense-tracker/main.py': [Errno 2] No such file or directory
+[exit code: 2]
+
+$ python3 -m expenses.cli --file sample_data.json summary
+Total: 10900.0
+  food 9900.0
+  transport 1000.0
+[exit code: 0]
+
+$ python3 -m compileall -q expenses
+[exit code: 0]
+

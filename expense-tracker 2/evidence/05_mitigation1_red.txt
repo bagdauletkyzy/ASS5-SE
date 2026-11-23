@@ -1,0 +1,10 @@
+$ python3 -m pytest -q tests/test_validation.py   (RED: before mitigation 1)
+FAILED tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01--5000]
+FAILED tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-0]
+FAILED tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-nan]
+FAILED tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-inf]
+FAILED tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-11-01-abc]
+FAILED tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[2026-02-30-100]
+FAILED tests/test_validation.py::test_ac4_invalid_input_rejected_and_not_saved[not-a-date-100]
+7 failed, 1 passed in 0.04s
+[exit code: 1]

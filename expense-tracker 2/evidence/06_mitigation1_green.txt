@@ -1,0 +1,22 @@
+(GREEN: after mitigation 1)
+$ python3 -m pytest -q
+...................                                                      [100%]
+19 passed in 0.04s
+[exit code: 0]
+
+$ mypy expenses
+Success: no issues found in 5 source files
+[exit code: 0]
+
+$ python3 -m expenses.cli --file /tmp/tmp.hXDH6Pae0f/a.json add 2026-02-30 food Refund hack -- -5000
+Error: invalid date '2026-02-30', expected a real date YYYY-MM-DD
+[exit code: 2]
+
+$ python3 -m expenses.cli --file /tmp/tmp.hXDH6Pae0f/a.json add 2026-11-01 food NaN test nan
+Error: amount must be a positive finite number, got 'nan'
+[exit code: 2]
+
+$ ls /tmp/tmp.hXDH6Pae0f
+[exit code: 0]
+
+fromisoformat("20261101") -> 2026-11-01

@@ -1,0 +1,112 @@
+## F1 negative / zero / invalid amounts and impossible dates accepted
+$ python3 -m expenses.cli --file /tmp/tmp.o0Jgbyrjat/a.json add 2026-02-30 food Refund hack -- -5000
+Added: Refund hack -5000.0
+[exit code: 0]
+
+$ python3 -m expenses.cli --file /tmp/tmp.o0Jgbyrjat/a.json add not-a-date food Zero 0
+Added: Zero 0.0
+[exit code: 0]
+
+$ python3 -m expenses.cli --file /tmp/tmp.o0Jgbyrjat/a.json summary
+Total: -5000.0
+  food -5000.0
+[exit code: 0]
+
+$ python3 -m expenses.cli --file /tmp/tmp.o0Jgbyrjat/a.json add 2026-11-01 food NaN test nan
+Added: NaN test nan
+[exit code: 0]
+
+$ python3 -m expenses.cli --file /tmp/tmp.o0Jgbyrjat/a.json summary
+Total: nan
+  food nan
+[exit code: 0]
+
+## F2 float rounding in totals
+$ python3 -c from expenses.models import Expense as E; from expenses.report import total; print(total([E('2026-11-01','x','a',0.1),E('2026-11-01','x','b',0.2)]))
+0.30000000000000004
+[exit code: 0]
+
+## F3 corrupted JSON -> unhandled traceback
+$ python3 -m expenses.cli --file /tmp/tmp.o0Jgbyrjat/bad.json summary
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/json/decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 1 column 43 (char 42)
+[exit code: 1]
+
+## F4 CSV formula injection
+$ python3 -m expenses.cli --file /tmp/tmp.o0Jgbyrjat/c.json export --format csv
+date,category,description,amount
+2026-11-01,food,Lunch at canteen,2500.0
+2026-11-02,transport,Bus card top-up,1000.0
+2026-11-03,food,Groceries,7400.0
+2026-11-04,misc,"=HYPERLINK(""http://example.invalid"",""click"")",100.0
+
+[exit code: 0]
+
+## F5 unpinned dependencies
+$ cat requirements.txt
+pytest
+ruff
+mypy
+[exit code: 0]
+
+## F6 README accuracy
+$ grep -n -E main.py|SQLite README.md
+11:    python main.py add 2026-11-01 food "Lunch" 2500
+12:    python main.py summary
+13:    python main.py export --format csv --out report
+15:Data is stored in a SQLite database.
+[exit code: 0]
+
+$ grep -rn -i sqlite expenses
+[exit code: 1]
+
+## F7 no agent playbook / CI / hooks
+$ ls -a
+.ruff_cache
+README.md
+expenses
+requirements.txt
+sample_data.json
+tests
+[exit code: 0]
+
+## F8 (AI claim) SQL injection in storage
+$ grep -rn -i -E sql|execute|cursor expenses
+[exit code: 1]
+
+## F9 (AI claim) non-atomic save may corrupt file on crash
+$ grep -n open(path, "w") expenses/storage.py
+18:    with open(path, "w") as f:
+[exit code: 0]
+
+## F10 (AI claim) --out allows path traversal
+$ grep -n args.out expenses/cli.py
+50:        if args.out:
+51:            out = args.out if args.out.endswith(ext) else args.out + ext
+[exit code: 0]
+
+## F7 (full) — agent playbook / CI / hooks present?
+$ ls -a
+.
+..
+.git
+.gitignore
+.mypy_cache
+.pytest_cache
+.ruff_cache
+README.md
+expenses
+requirements.txt
+sample_data.json
+tests
+$ ls AGENTS.md CLAUDE.md .github .pre-commit-config.yaml pyproject.toml
+ls: cannot access 'AGENTS.md': No such file or directory
+ls: cannot access 'CLAUDE.md': No such file or directory
+ls: cannot access '.github': No such file or directory
+ls: cannot access '.pre-commit-config.yaml': No such file or directory
+ls: cannot access 'pyproject.toml': No such file or directory
+[exit code: 2]

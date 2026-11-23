@@ -1,0 +1,13 @@
+Commit author was set to "Bagdauletkyzy Akbota" with git filter-branch on 2026-11-23.
+This changes commit hashes only; file contents of every commit are identical.
+Logs 01-09 were captured before the rewrite and show the old hashes.
+
+old      -> new      commit
+e11ee4f  -> 22114bf  Baseline (tag baseline)
+61e86cb  -> 2631481  docs: AGENTS.md, CLAUDE.md, README fix
+688b504  -> f5a9ff9  test: characterization tests AC1-AC3
+4bcbbc0  -> ad2b13f  test: fix expected text-export line
+48dfe68  -> 9c7df9b  refactor: Strategy (tag after-pattern)
+f6d43dc  -> ed69074  fix(R1) input validation
+5ac01d5  -> a59d322  fix(R2) CSV injection (tag final)
+b64a1a1  -> 40b01d8  docs: evidence logs

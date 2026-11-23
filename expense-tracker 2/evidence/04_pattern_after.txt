@@ -1,0 +1,35 @@
+$ python3 -m pytest -q
+..........                                                               [100%]
+10 passed in 0.02s
+[exit code: 0]
+
+$ ruff check .
+F401 [*] `expenses.models.Expense` imported but unused
+ --> expenses/storage.py:4:29
+  |
+2 | import os
+3 |
+4 | from expenses.models import Expense, expense_from_dict, expense_to_dict
+  |                             ^^^^^^^
+5 |
+6 | DEFAULT_FILE = "expenses.json"
+  |
+help: Remove unused import: `expenses.models.Expense`
+  |
+3 |
+  - from expenses.models import Expense, expense_from_dict, expense_to_dict
+4 + from expenses.models import expense_from_dict, expense_to_dict
+5 |
+  |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+[exit code: 1]
+
+$ mypy expenses
+Success: no issues found in 5 source files
+[exit code: 0]
+
+ expenses/cli.py    | 16 +++++-------
+ expenses/report.py | 72 ++++++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 59 insertions(+), 29 deletions(-)
